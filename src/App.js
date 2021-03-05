@@ -1,97 +1,96 @@
 import React, { Component } from 'react';
-import Client from 'shopify-buy';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
-
+import { connect } from 'react-redux';
+import Client from 'shopify-buy';
 import Navigation from './components/Navigation';
+import Products from './components/Products';
+import Product from './components/Product';
 import Footer from './components/Footer';
-import Cart from './components/Cart';
 
-import Home from './pages/Home';
-import Product from './pages/Product';
-
-const ShopContext = React.createContext();
+const StoreContext = React.createContext();
 
 const client = Client.buildClient({
-  storefrontAccessToken: '',
-  domain: ''
+  storefrontAccessToken: "",
+  domain: ""
 });
 
 class App extends Component {
-  
-  state = {
-    products: [],
-    product: {},
-    checkout: { lineItems: [] },
-    isCartOpen: false
+  constructor() {
+    super();
+    this.state = {
+      data: null,
+      cart: false
+    };
   };
 
-  componentDidMount() {
-    this.createCheckout();
-  };
-
+  // Create new checkout + update checkout
   createCheckout = async () => {
     const checkout = await client.checkout.create();
-    this.setState({checkout: checkout});
+    this.props.dispatch({type: "UPDATE_CHECKOUT", data: checkout});
   };
 
+  // Add item to cart + update checkout
   addCart = async (variantId, quantity) => {
     const lineItemsToAdd = [{variantId, quantity: parseInt(quantity, 10)}];
-    const checkout = await client.checkout.addLineItems(this.state.checkout.id, lineItemsToAdd);
-    this.setState({checkout: checkout, isCartOpen: true});
+    const checkout = await client.checkout.addLineItems(this.props.checkout.id, lineItemsToAdd);
+    this.props.dispatch({type: "UPDATE_CHECKOUT", data: checkout});
   };
 
+  // Remove item from cart + update checkout
   removeCart = async (lineItemId) => {
-    const checkout = await client.checkout.removeLineItems(this.state.checkout.id, [lineItemId]);
-    this.setState({checkout: checkout});
+    const checkout = await client.checkout.removeLineItems(this.props.checkout.id, [lineItemId]);
+    this.props.dispatch({type: "UPDATE_CHECKOUT", data: checkout});
   };
 
-  quantityCart = async (lineItemId, quantity) => {
+  // Update quantities + update checkout
+  updateCart = async (lineItemId, quantity) => {
     const lineItemUpdate = [{id: lineItemId, quantity: parseInt(quantity, 10)}];
-    const checkout = await client.checkout.updateLineItem(this.state.checkout.id, lineItemUpdate);
-    this.setState({checkout: checkout});
+    const checkout = await client.checkout.updateLineItems(this.props.checkout.id, lineItemUpdate);
+    this.props.dispatch({type: "UPDATE_CHECKOUT", data: checkout});
   };
 
+  // Fetch all products
   fetchProducts = async () => {
     const products = await client.product.fetchAll();
-    this.setState({products: products});
+    this.setState({data: products});
   };
 
+  // Fetch certain product by ID
   fetchProduct = async (id) => {
     const product = await client.product.fetch(id);
-    this.setState({product: product});
+    this.setState({data: product});
   };
-
-  openCart = () => { this.setState({isCartOpen: true}); };
-  closeCart = () => { this.setState({isCartOpen: false}); };
 
   render() {
     return (
-      <ShopContext.Provider value={{...this.state,
+      <StoreContext.Provider value={{
         createCheckout: this.createCheckout,
         addCart: this.addCart,
         removeCart: this.removeCart,
-        quantityCart: this.quantityCart,
+        updateCart: this.updateCart,
         fetchProducts: this.fetchProducts,
-        fetchProduct: this.fetchProduct,
-        openCart: this.openCart,
-        closeCart: this.closeCart}}>
+        fetchProduct: this.fetchProduct
+      }}>
         <Navigation />
-        <Cart />
         <Router>
           <Switch>
-            <Route exact path="/">
-              <Home />
-            </Route>
             <Route path="/product/:id">
               <Product />
+            </Route>
+            <Route path="/">
+              <Products />
             </Route>
           </Switch>
         </Router>
         <Footer />
-      </ShopContext.Provider>
+      </StoreContext.Provider>
     );
   };
 };
 
-export { ShopContext };
-export default App;
+const mapStateToProps = (state) => ({
+  checkout: state.checkout
+});
+
+export { StoreContext };
+export default connect(mapStateToProps)(App);
