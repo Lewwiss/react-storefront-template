@@ -6,12 +6,13 @@ import Navigation from './components/Navigation';
 import Products from './components/Products';
 import Product from './components/Product';
 import Footer from './components/Footer';
+import Cart from './components/Cart';
 
 const StoreContext = React.createContext();
 
 const client = Client.buildClient({
-  storefrontAccessToken: "",
-  domain: ""
+  storefrontAccessToken: "30ae12514dc814139477018c12d29947",
+  domain: "react-storefront-template.myshopify.com"
 });
 
 class App extends Component {
@@ -69,9 +70,12 @@ class App extends Component {
         removeCart: this.removeCart,
         updateCart: this.updateCart,
         fetchProducts: this.fetchProducts,
-        fetchProduct: this.fetchProduct
+        fetchProduct: this.fetchProduct,
+        data: this.state.data,
+        cart: this.state.cart
       }}>
         <Navigation />
+        {this.state.cart ? <Cart /> : null}
         <Router>
           <Switch>
             <Route path="/product/:id">
