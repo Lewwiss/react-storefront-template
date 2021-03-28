@@ -14,7 +14,7 @@ _(Also make sure all products are available to the private apps sales channel)_
   });
 ```
 
-### Installed Packages
+## Installed Packages
 
 * [React](https://reactjs.org/)
 * [Redux / React-Redux](https://react-redux.js.org/introduction/getting-started)
