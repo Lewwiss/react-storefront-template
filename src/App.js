@@ -2,11 +2,10 @@ import React, { Component } from 'react';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import { connect } from 'react-redux';
 import Client from 'shopify-buy';
-import Navigation from './components/Navigation';
-import Products from './components/Products';
-import Product from './components/Product';
-import Footer from './components/Footer';
+
 import Cart from './components/Cart';
+import Home from './pages/Home';
+import Product from './pages/Product';
 
 const StoreContext = React.createContext();
 
@@ -74,19 +73,17 @@ class App extends Component {
         data: this.state.data,
         cart: this.state.cart
       }}>
-        <Navigation />
         {this.state.cart ? <Cart /> : null}
         <Router>
           <Switch>
             <Route path="/product/:id">
-              <Product />
+              
             </Route>
             <Route path="/">
-              <Products />
+              <Home />
             </Route>
           </Switch>
         </Router>
-        <Footer />
       </StoreContext.Provider>
     );
   };
