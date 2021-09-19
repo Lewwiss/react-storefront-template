@@ -1,6 +1,6 @@
 # React / Shopify Storefront
 
-An application that uses the [Shopify Buy SDK](https://shopify.github.io/js-buy-sdk/). Allow's users to create a React storefront while still using Shopify basic plan.
+An application that uses the [Shopify Buy SDK](https://shopify.github.io/js-buy-sdk/). Allows users to create a separate PWA and use Shopify as a headless CMS.
 
 ## Setup
 
